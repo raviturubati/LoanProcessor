@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace LoanProcessor.Auth.ViewModels
 {
+    // Test for checkin
     public class LoginViewModel
     {
         public string UserName { get; set; }
