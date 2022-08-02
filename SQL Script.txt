@@ -1,5 +1,11 @@
+USE [AngularDB]
+GO
 
-/****** Object:  Table [dbo].[LoanDetails]    Script Date: 02-08-2022 15:33:50 ******/
+/****** Object:  Table [dbo].[LoanDetails]    Script Date: 02-08-2022 15:37:07 ******/
+DROP TABLE [dbo].[LoanDetails]
+GO
+
+/****** Object:  Table [dbo].[LoanDetails]    Script Date: 02-08-2022 15:37:07 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -27,3 +33,5 @@ CREATE TABLE [dbo].[LoanDetails](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
 GO
+
+
