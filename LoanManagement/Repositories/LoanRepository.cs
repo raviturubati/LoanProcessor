@@ -11,6 +11,8 @@ namespace LoanManagement.Repositories
     public class LoanRepository : ILoanRepository
     {
 
+        //testcheck in
+
          private readonly LoanDbContext _loandBContext;
 
         //  AngularDBContext db = new AngularDBContext();
