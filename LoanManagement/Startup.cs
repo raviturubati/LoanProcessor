@@ -1,22 +1,22 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LoanManagement.Data;
+using LoanManagement.Helper;
+using LoanManagement.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
-using LoanProcessor.Auth.Data;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using LoanProcessor.Auth.Repositories;
 using Microsoft.OpenApi.Models;
 
-namespace LoanProcessor.Auth
+namespace LoanManagement
 {
     public class Startup
     {
@@ -31,32 +31,18 @@ namespace LoanProcessor.Auth
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
-            //Authentication Token
-            var secretKay = Configuration.GetSection("JwtSettings").GetSection("Secret").Value;
-            services.AddAuthentication(auth =>
+            services.AddControllersWithViews().AddJsonOptions(options =>
             {
-                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }
-                ).AddJwtBearer(b =>
-                {
-                    b.RequireHttpsMetadata = false;
-                    b.SaveToken = true;
-                    b.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(secretKay)),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
-                }
+                //options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                //options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                // options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.Converters.Add(new IntToStringConverter());
+            });
 
-                 );
-            services.AddSingleton<IUserRepository>(new UserRepository(secretKay));
 
-            services.AddDbContext<LoanProcessorAuthContext>(options =>
-                   options.UseSqlServer(Configuration.GetConnectionString("LoanProcessorAuthContext")));
+            services.AddDbContext<LoanDbContext>(options =>
+                   options.UseSqlServer(Configuration.GetConnectionString("LoanDbConnection")));
+            services.AddTransient<ILoanRepository, LoanRepository>();
 
             //services.AddSwaggerDocumentation();
             services.AddSwaggerGen(s =>
@@ -67,7 +53,6 @@ namespace LoanProcessor.Auth
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             if (env.IsDevelopment())
             {
                 app.UseCors(x => x
@@ -79,23 +64,17 @@ namespace LoanProcessor.Auth
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-            }            
+            }
+
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthorization();
 
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });
-
-            //app.UseSwaggerDocumentation();
-            app.UseSwagger();
-            app.UseSwaggerUI(s =>
-            {
-                s.SwaggerEndpoint("v1/swagger.json", "Authentication  V1");
             });
         }
     }

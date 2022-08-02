@@ -22,7 +22,7 @@ namespace LoanProcessor.Auth.Repositories
         public async Task<User> Authenticate(string userName, string password)
         {
             var temUser =  users.Where(x => x.UserName.Equals(userName)).FirstOrDefault();
-            if (!temUser.UserName.Equals(userName))
+            if (temUser == null || !temUser.UserName.Equals(userName))
             {
                 return null;
             }
@@ -48,7 +48,7 @@ namespace LoanProcessor.Auth.Repositories
         {
             new User
             {
-                UserName = "Ravi",
+                UserName = "Ravi1",
                 Password = "password",
                 Role = "admin"
             },
